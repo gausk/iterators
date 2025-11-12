@@ -1,3 +1,7 @@
+pub mod extension;
+pub mod flat_map;
+mod iter;
+
 pub fn flatten<I>(iter: I) -> Flatten<I::IntoIter>
 where
     I: IntoIterator,
@@ -138,4 +142,19 @@ fn test_double_ended() {
     assert_eq!(flat.next(), Some(2));
     assert_eq!(flat.next(), None);
     assert_eq!(flat.next_back(), None);
+}
+
+#[test]
+fn test_inf() {
+    let mut flat = flatten((0..).map(|i| 0..i));
+    assert_eq!(flat.next(), Some(0));
+    assert_eq!(flat.next(), Some(0));
+    assert_eq!(flat.next(), Some(1));
+    assert_eq!(flat.next(), Some(0));
+}
+
+#[test]
+fn test_multiple_level_deep() {
+    assert_eq!(flatten(vec![vec![vec![1, 2]]]).count(), 1);
+    assert_eq!(flatten(flatten(vec![vec![vec![1, 2]]])).count(), 2);
 }
